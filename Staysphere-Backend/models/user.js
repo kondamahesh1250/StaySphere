@@ -16,7 +16,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    
+
     phone: {
       type: String,
       default: "",
@@ -46,6 +46,9 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   {
     timestamps: true,

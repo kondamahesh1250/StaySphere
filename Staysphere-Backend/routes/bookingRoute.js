@@ -6,9 +6,10 @@ const moment = require("moment");
 const Room = require("../models/room");
 const { v4: uuidv4 } = require("uuid");
 const Stripe = require("stripe");
+const authMiddleware = require("../middleware/auth");
 const stripe = new Stripe(process.env.STRIPE_KEY);
 
-router.post("/bookroom", async (req, res) => {
+router.post("/bookroom", authMiddleware, async (req, res) => {
   const {
     room,
     userid,
@@ -93,7 +94,7 @@ router.post("/bookroom", async (req, res) => {
   }
 });
 
-router.post("/getbookingsbyuserid", async (req, res) => {
+router.post("/getbookingsbyuserid", authMiddleware, async (req, res) => {
   const userid = req.body.userid;
   try {
     const bookings = await Booking.find({ userid: userid });
@@ -103,7 +104,7 @@ router.post("/getbookingsbyuserid", async (req, res) => {
   }
 });
 
-router.post("/cancelbooking", async (req, res) => {
+router.post("/cancelbooking", authMiddleware, async (req, res) => {
   const { bookingid, roomid } = req.body;
 
   try {
@@ -130,7 +131,7 @@ router.post("/cancelbooking", async (req, res) => {
   }
 });
 
-router.get("/getallbookings", async (req, res) => {
+router.get("/getallbookings", authMiddleware, async (req, res) => {
   try {
     const bookings = await Booking.find();
     res.send(bookings);

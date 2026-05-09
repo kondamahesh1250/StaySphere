@@ -7,7 +7,7 @@ const { OAuth2Client } = require("google-auth-library");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const authMiddleware = require("../middleware/authMiddleware_verify");
+const authMiddleware = require("../middleware/auth");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -89,7 +89,7 @@ router.get("/getallusers", async (req, res) => {
   }
 });
 
-router.post("/updatepassword/:id", async (req, res) => {
+router.post("/updatepassword/:id", authMiddleware, async (req, res) => {
   const { password } = req.body;
   const id = req.params.id;
 
@@ -169,7 +169,7 @@ router.post("/googlesign", async (req, res) => {
   }
 });
 
-router.patch("/edit/:id", async (req, res) => {
+router.patch("/edit/:id", authMiddleware, async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -199,7 +199,7 @@ router.patch("/edit/:id", async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", authMiddleware, async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -218,6 +218,147 @@ router.delete("/delete/:id", async (req, res) => {
 
     res.status(500).send({
       success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
+const crypto = require("crypto");
+const transporter = require("../config/mail");
+
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send({
+        message: "User not found",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+    await user.save();
+
+    const resetUrl = `${process.env.REDIRECT_URI}/reset-password/${resetToken}`;
+
+    await transporter.sendMail({
+      from: `"StaySphere" <${process.env.EMAIL}>`,
+      to: user.email,
+      subject: "Reset Your Password",
+      html: `
+    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px 20px;">
+      
+      <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        
+        <div style="background: #0d6efd; padding: 20px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0;">
+            Password Reset
+          </h1>
+        </div>
+
+        <div style="padding: 30px;">
+          
+          <h3 style="color: #333;">
+            Hello ${user.name},
+          </h3>
+
+          <p style="color: #555; line-height: 1.6;">
+            We received a request to reset your password.
+            Click the button below to create a new password.
+          </p>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a 
+              href="${resetUrl}" 
+              style="
+                background: #0d6efd;
+                color: #ffffff;
+                padding: 14px 30px;
+                text-decoration: none;
+                border-radius: 5px;
+                display: inline-block;
+                font-weight: bold;
+              "
+            >
+              Reset Password
+            </a>
+          </div>
+
+          <p style="color: #777; line-height: 1.6;">
+            This link will expire in <strong>10 minutes</strong>.
+          </p>
+
+          <p style="color: #777; line-height: 1.6;">
+            If you did not request a password reset, please ignore this email.
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+
+          <p style="font-size: 13px; color: #999; text-align: center;">
+            © 2026 Hotel Booking System. All rights reserved.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  `,
+    });
+
+    res.send({
+      message: "Reset link sent to email",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Something went wrong",
+    });
+  }
+});
+
+router.post("/reset-password/:token", async (req, res) => {
+  try {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).send({
+        message: "Invalid or expired token",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    user.password = hashedPassword;
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.send({
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).send({
       message: "Something went wrong",
     });
   }
