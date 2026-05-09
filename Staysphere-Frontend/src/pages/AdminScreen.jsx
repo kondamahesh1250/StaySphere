@@ -11,6 +11,7 @@ import API from "../services/api";
 const AdminScreen = () => {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
+  const [refreshRooms, setRefreshRooms] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -18,13 +19,24 @@ const AdminScreen = () => {
     }
   }, [token, navigate]);
 
+  const handleRoomAdded = () => {
+    setRefreshRooms((prev) => !prev);
+  };
   // const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const items = [
     { key: "1", label: "Bookings", children: <Bookings /> },
-    { key: "2", label: "Rooms", children: <Rooms /> },
+    {
+      key: "2",
+      label: "Rooms",
+      children: <Rooms refreshRooms={refreshRooms} />,
+    },
     { key: "3", label: "Users", children: <Users /> },
-    { key: "4", label: "Add Room", children: <AddRoom /> },
+    {
+      key: "4",
+      label: "Add Room",
+      children: <AddRoom onRoomAdded={handleRoomAdded} />,
+    },
   ];
 
   return (
@@ -122,11 +134,10 @@ export const Bookings = () => {
 };
 
 /* ================= ROOMS ================= */
-export const Rooms = () => {
+export const Rooms = ({ refreshRooms }) => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
   const [show, setShow] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [updatedData, setUpdatedData] = useState({});
@@ -147,7 +158,7 @@ export const Rooms = () => {
 
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [refreshRooms]);
 
   const handleClose = () => {
     setShow(false);
@@ -687,7 +698,7 @@ export const Users = () => {
 };
 
 /* ================= ADD ROOM ================= */
-export const AddRoom = () => {
+export const AddRoom = ({ onRoomAdded }) => {
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
@@ -699,8 +710,8 @@ export const AddRoom = () => {
   const [imageUrl1, setImageUrl1] = useState("");
   const [imageUrl2, setImageUrl2] = useState("");
   const [imageUrl3, setImageUrl3] = useState("");
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
 
   const [features, setFeatures] = useState({
     Wifi: false,
@@ -724,6 +735,23 @@ export const AddRoom = () => {
   async function addRoom(e) {
     e.preventDefault();
 
+    if (
+      !name ||
+      !description ||
+      !rentperday ||
+      !maxcount ||
+      !phonenumber ||
+      !type ||
+      !imageUrl1 ||
+      !imageUrl2 ||
+      !imageUrl3 ||
+      !latitude ||
+      !longitude
+    ) {
+      toast.error("All fields are required!");
+      return;
+    }
+
     const newRoom = {
       name,
       description,
@@ -742,6 +770,7 @@ export const AddRoom = () => {
     try {
       setLoading(true);
       const { data } = await API.post(`/rooms/addroom`, newRoom);
+      console.log(data);
 
       if (data) {
         Swal.fire("Success!", "Room added successfully", "success");
@@ -751,12 +780,16 @@ export const AddRoom = () => {
         setMaxCount("");
         setPhoneNumber("");
         setType("");
+
         setImageUrl1("");
         setImageUrl2("");
         setImageUrl3("");
+
         setFeatures({});
-        setLatitude(null);
-        setLongitude(null);
+
+        setLatitude("");
+        setLongitude("");
+        onRoomAdded();
       } else {
         Swal.fire("Oops", "Delete Failed!", "error");
         setLoading(false);
@@ -781,6 +814,7 @@ export const AddRoom = () => {
             <div className="mb-3">
               <label className="form-label">Room Name</label>
               <input
+                type="text"
                 className="form-control"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -791,6 +825,7 @@ export const AddRoom = () => {
             <div className="mb-3">
               <label className="form-label">Rent Per Day</label>
               <input
+                type="number"
                 className="form-control"
                 value={rentperday}
                 onChange={(e) => setRentPerDay(e.target.value)}
@@ -801,6 +836,7 @@ export const AddRoom = () => {
             <div className="mb-3">
               <label className="form-label">Max Count</label>
               <input
+                type="number"
                 className="form-control"
                 value={maxcount}
                 onChange={(e) => setMaxCount(e.target.value)}
@@ -821,21 +857,43 @@ export const AddRoom = () => {
             <div className="mb-3">
               <label className="form-label">Phone</label>
               <input
+                type="tel"
+                maxLength={10}
+                pattern="[0-9]{10}"
                 className="form-control"
                 value={phonenumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                // onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  if (value.length <= 10) {
+                    setPhoneNumber(value);
+                  }
+                }}
                 required
               />
             </div>
 
             <div className="mb-3">
               <label className="form-label">Type</label>
-              <input
+              {/* <input
                 className="form-control"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
                 required
-              />
+              /> */}
+              <select
+                className="form-select"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+              >
+                <option value="">--Select--</option>
+                <option value="delux">Delux</option>
+                <option value="non-delux">Non-Delux</option>
+                <option value="suite">Suite</option>
+                <option value="executive">Executive</option>
+                <option value="luxury villa">Luxury Villa</option>
+                <option value="budget">Budget</option>
+              </select>
             </div>
           </div>
 
@@ -844,6 +902,7 @@ export const AddRoom = () => {
             <div className="mb-3">
               <label className="form-label">Image 1</label>
               <input
+                type="text"
                 className="form-control"
                 value={imageUrl1}
                 onChange={(e) => setImageUrl1(e.target.value)}
@@ -854,6 +913,7 @@ export const AddRoom = () => {
             <div className="mb-3">
               <label className="form-label">Image 2</label>
               <input
+                type="text"
                 className="form-control"
                 value={imageUrl2}
                 onChange={(e) => setImageUrl2(e.target.value)}
@@ -864,6 +924,7 @@ export const AddRoom = () => {
             <div className="mb-3">
               <label className="form-label">Image 3</label>
               <input
+                type="text"
                 className="form-control"
                 value={imageUrl3}
                 onChange={(e) => setImageUrl3(e.target.value)}
@@ -875,6 +936,7 @@ export const AddRoom = () => {
               <div className="col-md-6 mb-3">
                 <label className="form-label">Latitude</label>
                 <input
+                  type="number"
                   className="form-control"
                   value={latitude}
                   onChange={(e) => setLatitude(e.target.value)}
@@ -885,6 +947,7 @@ export const AddRoom = () => {
               <div className="col-md-6 mb-3">
                 <label className="form-label">Longitude</label>
                 <input
+                  type="number"
                   className="form-control"
                   value={longitude}
                   onChange={(e) => setLongitude(e.target.value)}

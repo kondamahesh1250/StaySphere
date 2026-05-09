@@ -81,7 +81,6 @@ const LoginPage = () => {
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
-
       <div className="row w-100">
         {/* Form Section */}
         <div className="col-md-5 mx-auto">
@@ -97,8 +96,8 @@ const LoginPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter email"
-                  />
-                  <label>Email</label>
+                />
+                <label>Email</label>
               </div>
               <div className="form-floating mb-3">
                 <input
@@ -108,8 +107,8 @@ const LoginPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter password"
-                  />
-                  <label>Password</label>
+                />
+                <label>Password</label>
               </div>
 
               <button
@@ -135,6 +134,9 @@ const LoginPage = () => {
               Continue as Guest
             </button>
 
+            <p className="text-center">
+              Forgot Password? <Link to="/forgot-password">Reset Here</Link>
+            </p>
             <p className="text-center">
               Don't have an account? <Link to="/register">Register</Link>
             </p>

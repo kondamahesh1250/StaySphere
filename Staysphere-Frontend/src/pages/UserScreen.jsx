@@ -61,8 +61,8 @@ const UserScreen = () => {
       return;
     }
 
-    if (!phone && !address && !city && !pincode) {
-      toast.error("All fields are required");
+    if (!phone || !address || !city || !pincode) {
+      toast.error("All fields are required!");
       return;
     }
 
@@ -391,8 +391,9 @@ export const MyProfile = ({
           )}
 
           {/* Modal Backdrop */}
-          {showPassword ||
-            (showProfile && <div className="modal-backdrop fade show"></div>)}
+          {(showPassword || showProfile) && (
+            <div className="modal-backdrop fade show"></div>
+          )}
         </>
       )}
     </div>

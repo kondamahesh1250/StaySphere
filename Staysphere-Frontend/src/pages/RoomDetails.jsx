@@ -106,7 +106,7 @@ const RoomDetails = () => {
                 <h4 className="fw-bold">{rooms?.name}</h4>
                 <p>{rooms?.description}</p>
 
-                <p>
+                <p className="text-capitalize">
                   <b>Type:</b> {rooms?.type}
                 </p>
                 <p>

@@ -51,7 +51,7 @@ const RoomPage = ({ room, fromDate, toDate }) => {
             .join(", ")}
         </p>
 
-        <p className="mb-1">
+        <p className="mb-1 text-capitalize">
           <strong>Type:</strong> {room.type}
         </p>
 

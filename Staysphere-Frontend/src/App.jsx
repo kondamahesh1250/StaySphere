@@ -17,6 +17,8 @@ import Contact from "./pages/Contact.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import "antd/dist/reset.css";
 import { AuthContext } from "./components/AuthContext.jsx";
+import ForgotPassword from "./components/ForgotPassword.jsx";
+import ResetPassword from "./components/ResetPassword.jsx";
 
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
@@ -72,7 +74,7 @@ function App() {
     window.addEventListener("click", resetTimer);
     window.addEventListener("touchstart", resetTimer);
 
-    if(localStorage.getItem("guestUser")) {
+    if (localStorage.getItem("guestUser")) {
       return;
     }
 
@@ -107,6 +109,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/user/dashboard" element={<UserScreen />} />
         <Route path="/admin/dashboard" element={<AdminScreen />} />
+        <Route path="/forgot-password" element={<ForgotPassword/>} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <ToastContainer />
     </div>

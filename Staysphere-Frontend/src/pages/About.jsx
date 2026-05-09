@@ -1,3 +1,5 @@
+import aboutImage from "../assets/about_img.avif";
+
 export default function About() {
   return (
     <div className="container py-5">
@@ -14,7 +16,8 @@ export default function About() {
       <div className="row align-items-center g-5 mb-5">
         <div className="col-lg-6">
           <img
-            src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format&fit=crop"
+            // src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format&fit=crop"
+            src={aboutImage}
             alt="Hotel"
             className="img-fluid rounded shadow"
           />
@@ -24,8 +27,8 @@ export default function About() {
           <h2 className="fw-bold mb-3">Who We Are</h2>
           <p className="text-muted">
             StaySphere helps users discover, explore, and book premium hotel
-            rooms with ease. Whether you are planning a vacation, business
-            trip, or weekend getaway, our platform offers a seamless booking
+            rooms with ease. Whether you are planning a vacation, business trip,
+            or weekend getaway, our platform offers a seamless booking
             experience with secure online payments and instant confirmations.
           </p>
 
@@ -37,24 +40,30 @@ export default function About() {
 
           <div className="mt-4">
             <div className="d-flex align-items-center mb-3">
-              <div className="bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-3"
-                style={{ width: "45px", height: "45px" }}>
+              <div
+                className="bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-3"
+                style={{ width: "45px", height: "45px" }}
+              >
                 ✓
               </div>
               <span>Secure Online Payments</span>
             </div>
 
             <div className="d-flex align-items-center mb-3">
-              <div className="bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-3"
-                style={{ width: "45px", height: "45px" }}>
+              <div
+                className="bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-3"
+                style={{ width: "45px", height: "45px" }}
+              >
                 ✓
               </div>
               <span>Real-Time Room Availability</span>
             </div>
 
             <div className="d-flex align-items-center mb-3">
-              <div className="bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-3"
-                style={{ width: "45px", height: "45px" }}>
+              <div
+                className="bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-3"
+                style={{ width: "45px", height: "45px" }}
+              >
                 ✓
               </div>
               <span>Fast & Easy Booking Experience</span>
