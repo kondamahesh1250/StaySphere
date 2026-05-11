@@ -272,7 +272,7 @@ export const Rooms = ({ refreshRooms }) => {
                   <tr key={room?._id}>
                     <td>{index + 1}</td>
                     <td>{room?.name}</td>
-                    <td>{room?.type}</td>
+                    <td className="text-capitalize">{room?.type}</td>
                     <td>{room?.rentperday}</td>
                     <td>{room?.maxcount}</td>
                     <td>{room?.phonenumber}</td>
@@ -461,13 +461,27 @@ export const Rooms = ({ refreshRooms }) => {
                         <div className="mb-3">
                           <label className="form-label">Type</label>
 
-                          <input
+                          {/* <input
                             type="text"
                             className="form-control"
                             name="type"
                             value={updatedData?.type || ""}
                             onChange={handleChange}
-                          />
+                          /> */}
+                          <select
+                            className="form-select"
+                            name="type"
+                            value={updatedData?.type || ""}
+                            onChange={handleChange}
+                          >
+                            <option value="">--Select--</option>
+                            <option value="delux">Delux</option>
+                            <option value="non-delux">Non-Delux</option>
+                            <option value="suite">Suite</option>
+                            <option value="executive">Executive</option>
+                            <option value="luxury villa">Luxury Villa</option>
+                            <option value="budget">Budget</option>
+                          </select>
                         </div>
 
                         <div className="mb-3">

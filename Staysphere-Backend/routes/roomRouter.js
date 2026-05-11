@@ -7,9 +7,9 @@ const authMiddleware = require("../middleware/auth");
 router.get("/getallrooms", async (req, res) => {
   try {
     const rooms = await Room.find({});
-    res.send(rooms);
+    res.status(200).send(rooms);
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(500).send({ error });
   }
 });
 
@@ -17,9 +17,9 @@ router.post("/getroombyid", async (req, res) => {
   const roomid = req.body.roomid;
   try {
     const room = await Room.findOne({ _id: roomid });
-    res.send(room);
+    res.status(200).send(room);
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(500).send({ error });
   }
 });
 
@@ -27,9 +27,9 @@ router.post("/addroom", authMiddleware, async (req, res) => {
   try {
     const room = new Room(req.body);
     await room.save();
-    res.send("New Room Added Successfully");
+    res.status(201).send("New Room Added Successfully");
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(500).send({ error });
   }
 });
 
@@ -48,9 +48,9 @@ router.put("/update/:id", authMiddleware, async (req, res) => {
 
     await room.save();
 
-    res.send(room);
+    res.status(200).send(room);
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).send({ error });
   }
 });
 
@@ -58,9 +58,9 @@ router.delete("/delete/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     await Room.findByIdAndDelete(id);
-    res.send("Room Deleted");
+    res.status(200).send("Room Deleted");
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(500).send({ error });
   }
 });
 

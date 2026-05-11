@@ -41,7 +41,6 @@ const RegisterPage = () => {
     try {
       setLoading(true);
       const { data } = await API.post(`/users/register`, formData);
-
       if (data) {
         toast.success("Registration Successful! Please Login");
         setTimeout(() => navigate("/login"), 1500);
@@ -49,9 +48,7 @@ const RegisterPage = () => {
 
       setFormData({ name: "", email: "", password: "", c_password: "" });
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Something went wrong!"
-      );
+      toast.error(error.response?.data?.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -59,7 +56,6 @@ const RegisterPage = () => {
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
-
       <div className="row w-100">
         {/* Form Section */}
         <div className="col-md-5 mx-auto">
@@ -119,7 +115,7 @@ const RegisterPage = () => {
                 <label htmlFor="c_password">Confirm Password</label>
               </div>
 
-               <button
+              <button
                 className="btn btn-dark w-100 mb-3 d-flex justify-content-center align-items-center"
                 type="submit"
                 disabled={loading}
@@ -134,19 +130,17 @@ const RegisterPage = () => {
                 )}
               </button>
             </form>
-       
-        {/* Google Section */}
-        <div className="text-center mb-3 border ">
-          <GoogleLogin name="Sign up with Google" />
-        </div>
+
+            {/* Google Section */}
+            <div className="text-center mb-3 border ">
+              <GoogleLogin name="Sign up with Google" />
+            </div>
 
             <p className="text-center mb-0">
-              Already have an account?{" "}
-              <a href="/login">Login</a>
+              Already have an account? <a href="/login">Login</a>
             </p>
           </div>
         </div>
-
       </div>
     </div>
   );

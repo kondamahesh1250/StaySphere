@@ -85,22 +85,23 @@ router.post("/bookroom", authMiddleware, async (req, res) => {
       });
 
       await roomTemp.save();
-      res.send("Payment Successfull, Your room is booked!");
+      res.status(200).send("Payment Successfull, Your room is booked!");
     } else {
       res.status(400).json({ error: "Payment failed" });
     }
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 
 router.post("/getbookingsbyuserid", authMiddleware, async (req, res) => {
   const userid = req.body.userid;
+
   try {
     const bookings = await Booking.find({ userid: userid });
-    res.send(bookings);
+    res.status(200).send(bookings);
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 
@@ -109,15 +110,12 @@ router.post("/cancelbooking", authMiddleware, async (req, res) => {
 
   try {
     const booking = await Booking.findOne({ _id: bookingid });
-
     booking.status = "cancelled";
 
     await booking.save();
 
     const room = await Room.findOne({ _id: roomid });
-
     const bookings = room.currentbookings;
-
     const tempBookings = bookings.filter(
       (booking) => booking.bookingid.toString() !== bookingid,
     );
@@ -125,18 +123,18 @@ router.post("/cancelbooking", authMiddleware, async (req, res) => {
 
     await room.save();
 
-    res.send("Your booking cancelled successfully");
+    res.status(200).send("Your booking cancelled successfully");
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 
 router.get("/getallbookings", authMiddleware, async (req, res) => {
   try {
     const bookings = await Booking.find();
-    res.send(bookings);
+    res.status(200).send(bookings);
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 

@@ -30,9 +30,10 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
     });
     await newUser.save();
+
     res.status(200).send({ message: "User Registered Successfully" });
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 
@@ -54,17 +55,17 @@ router.post("/login", async (req, res) => {
         JWT_SECRET,
         { expiresIn: "1h" },
       );
-      res.send({
+      res.status(200).send({
+        status:200,
         token: token,
         message: "Login Successfull",
         role: user.isAdmin ? "admin" : "user",
-        status: 200,
       });
     } else {
       return res.status(400).json({ message: "Login Failed" });
     }
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -74,18 +75,18 @@ router.get("/verifyuser", authMiddleware, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.send(user);
+    res.status(200).send(user);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
 router.get("/getallusers", async (req, res) => {
   try {
     const users = await User.find();
-    res.send(users);
+    res.status(200).send(users);
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -104,7 +105,7 @@ router.post("/updatepassword/:id", authMiddleware, async (req, res) => {
       res.send({ message: "Request submitted successfully", status: 200 });
     }
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -144,7 +145,7 @@ router.post("/googlesign", async (req, res) => {
         JWT_SECRET,
         { expiresIn: "1h" },
       );
-      return res.send({ token, role: userExist.isAdmin ? "admin" : "user" });
+      return res.status(200).send({ token, role: userExist.isAdmin ? "admin" : "user" });
     } else {
       const hashedPassword = await bcrypt.hash(payload.sub, 10);
       const newUser = new User({
@@ -161,11 +162,11 @@ router.post("/googlesign", async (req, res) => {
         { expiresIn: "1h" },
       );
 
-      return res.send({ token, role: newUser.isAdmin ? "admin" : "user" }); // Send token in response
+      return res.status(201).send({ token, role: newUser.isAdmin ? "admin" : "user" }); // Send token in response
     }
   } catch (error) {
     console.error("Error during Google login:", error);
-    res.status(500).send("Something went wrong");
+    res.status(500).send({ message: "Internal Server Error" });
   }
 });
 
@@ -190,8 +191,6 @@ router.patch("/edit/:id", authMiddleware, async (req, res) => {
       user: updatedUser,
     });
   } catch (error) {
-    console.log(error);
-
     res.status(500).send({
       success: false,
       message: "Something went wrong",
@@ -203,10 +202,8 @@ router.delete("/delete/:id", authMiddleware, async (req, res) => {
   try {
     const id = req.params.id;
 
-    // Delete all bookings of user
     await Booking.deleteMany({ userid: id });
 
-    // Delete user
     await User.findByIdAndDelete(id);
 
     res.status(200).send({
@@ -218,7 +215,7 @@ router.delete("/delete/:id", authMiddleware, async (req, res) => {
 
     res.status(500).send({
       success: false,
-      message: "Something went wrong",
+      message: "Internal Server Error",
     });
   }
 });
@@ -314,13 +311,13 @@ router.post("/forgot-password", async (req, res) => {
   `,
     });
 
-    res.send({
+    res.status(200).send({
       message: "Reset link sent to email",
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      message: "Something went wrong",
+      message: "Internal Server Error",
     });
   }
 });
@@ -352,14 +349,14 @@ router.post("/reset-password/:token", async (req, res) => {
 
     await user.save();
 
-    res.send({
+    res.status(200).send({
       message: "Password reset successful",
     });
   } catch (error) {
     console.log(error);
 
     res.status(500).send({
-      message: "Something went wrong",
+      message: "Internal Server Error",
     });
   }
 });

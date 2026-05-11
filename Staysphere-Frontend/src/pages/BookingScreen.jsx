@@ -112,6 +112,10 @@ const BookingScreen = () => {
       if (data) {
         Swal.fire("Success", "Payment successful", "success");
         setShowModal(false);
+        localStorage.removeItem("fromDate");
+        localStorage.removeItem("toDate");
+        localStorage.removeItem("searchkey");
+        localStorage.removeItem("roomtype");
         navigate("/homescreen");
       }
     } catch (err) {

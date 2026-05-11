@@ -36,8 +36,9 @@ const LoginPage = () => {
     try {
       setLoading(true);
       const { data } = await API.post(`/users/login`, formData);
-
-      if (data.token) {
+console.log(data)
+      
+      if (data.status === 200) {
         login(data.token, data.role);
 
         if (data.role === "admin") {
